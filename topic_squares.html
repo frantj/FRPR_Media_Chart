@@ -262,10 +262,9 @@ function sidebarHtml(g) {
         const headline = a.link
           ? `<a href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.headline)}</a>`
           : esc(a.headline);
-        const reach = a.reach > 0 ? ` &middot; ${(a.reach/1e6).toFixed(1)}M reach` : "";
         return `<div class="sb-article">
           <div class="sb-headline">${headline}</div>
-          <div class="sb-meta">${esc(a.outlet)} &middot; ${esc(a.date)}${reach}</div>
+          <div class="sb-meta">${esc(a.outlet)} &middot; ${esc(a.date)}</div>
         </div>`;
       }).join("")
     : `<div class="sb-meta" style="padding-top:8px">No curated articles for this topic.</div>`;
