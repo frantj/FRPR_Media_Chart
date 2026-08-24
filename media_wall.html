@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FRPRD Earned Media Wall</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --bg2: #1e293b;
+    --card: #ffffff;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --press: #2563eb;
+    --oped: #7c3aed;
+    --editorial: #0891b2;
+    --letter: #d97706;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #e2e8f0;
+    background: radial-gradient(1200px 600px at 20% -10%, #1e293b, var(--bg));
+    min-height: 100vh;
+  }
+  header {
+    padding: 28px 32px 8px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    letter-spacing: -0.02em;
+    font-weight: 800;
+  }
+  .sub { color: #94a3b8; margin-top: 6px; font-size: .95rem; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    padding: 14px 32px; max-width: 1400px; margin: 0 auto;
+  }
+  .group { display: flex; gap: 6px; align-items: center; }
+  .group .lbl { color: #94a3b8; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; margin-right: 4px; }
+  button.chip {
+    border: 1px solid rgba(255,255,255,.15);
+    background: rgba(255,255,255,.04);
+    color: #cbd5e1;
+    padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    font-size: .82rem; transition: all .15s ease;
+  }
+  button.chip:hover { background: rgba(255,255,255,.12); }
+  button.chip.active { background: #fff; color: #0f172a; border-color: #fff; font-weight: 600; }
+  .spacer { flex: 1; }
+  .hint { color: #64748b; font-size: .78rem; }
+
+  .wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-auto-rows: 116px;
+    grid-auto-flow: dense;
+    gap: 14px;
+    padding: 12px 32px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .card {
+    position: relative;
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 16px;
+    padding: 16px 16px 14px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,.25);
+    border-left: 4px solid var(--accent, var(--press));
+    transition: transform .16s ease, box-shadow .16s ease;
+    display: flex; flex-direction: column;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(0,0,0,.4); z-index: 5; }
+  .card .outlet {
+    font-size: .68rem; font-weight: 800; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--accent, var(--press));
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card .lock { font-size: .72rem; color: var(--muted); }
+  .card .headline {
+    margin-top: 8px; font-weight: 650; line-height: 1.24; color: #0f172a;
+    display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .card .badge {
+    margin-top: auto; font-size: .68rem; color: var(--muted);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card .badge .reach { font-weight: 700; color: #334155; }
+  .card .badge .surge { font-weight: 800; color: var(--accent, var(--press)); }
+
+  /* size tiers */
+  .t-featured { grid-column: span 2; grid-row: span 2; }
+  .t-large    { grid-column: span 2; grid-row: span 1; }
+  .t-medium   { grid-column: span 1; grid-row: span 2; }
+  .t-small    { grid-column: span 1; grid-row: span 1; }
+  .t-featured .headline { font-size: 1.28rem; -webkit-line-clamp: 4; }
+  .t-large    .headline { font-size: 1.02rem; -webkit-line-clamp: 3; }
+  .t-medium   .headline { font-size: .96rem; -webkit-line-clamp: 5; }
+  .t-small    .headline { font-size: .9rem; -webkit-line-clamp: 3; }
+
+  /* hover reveal panel */
+  .reveal {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #ffffff 26%);
+    padding: 26px 16px 14px;
+    transform: translateY(100%); opacity: 0;
+    transition: transform .18s ease, opacity .18s ease;
+  }
+  .card:hover .reveal { transform: translateY(0); opacity: 1; }
+  .reveal .date { font-size: .72rem; color: var(--muted); font-weight: 600; margin-bottom: 8px; }
+  .reveal .summary {
+    font-size: .8rem; color: #334155; line-height: 1.35; margin-bottom: 10px;
+    display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; -webkit-line-clamp: 3;
+  }
+  .t-small .reveal .summary, .t-large .reveal .summary { -webkit-line-clamp: 2; }
+  .read {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent, var(--press)); color: #fff;
+    text-decoration: none; font-size: .8rem; font-weight: 600;
+    padding: 7px 12px; border-radius: 8px; transition: filter .15s ease;
+  }
+  .read:hover { filter: brightness(1.08); }
+  .read.disabled { background: #cbd5e1; color: #64748b; pointer-events: none; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; }
+  .legend .item { display: flex; align-items: center; gap: 6px; color: #94a3b8; font-size: .78rem; }
+  .legend .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .empty { color: #94a3b8; padding: 40px 32px; }
+</style>
+</head>
+<body>
+  <header>
+    <h1>FRPRD Earned Media Wall</h1>
+    <div class="sub">
+      <span id="count">58</span> curated stories &middot; Feb 20, 2026 – Jun 30, 2026 &middot;
+      <span class="hint" id="sizeHint">card size reflects story momentum (outlets covering it that cycle)</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="group">
+      <span class="lbl">Size by</span>
+      <button class="chip active" data-size="momentum">Momentum</button>
+      <button class="chip" data-size="reach">Reach</button>
+    </div>
+    <div class="group">
+      <span class="lbl">Sort</span>
+      <button class="chip active" data-sort="momentum">Momentum</button>
+      <button class="chip" data-sort="reach">Reach</button>
+      <button class="chip" data-sort="date">Newest</button>
+      <button class="chip" data-sort="outlet">Outlet</button>
+    </div>
+    <div class="group">
+      <span class="lbl">Filter</span>
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="Press Hit">Press Hits</button>
+      <button class="chip" data-filter="Op-Ed">Op-Eds</button>
+      <button class="chip" data-filter="Editorial">Editorials</button>
+      <button class="chip" data-filter="Letter to the Editor">Letters</button>
+    </div>
+    <div class="spacer"></div>
+    <div class="legend">
+      <div class="item"><span class="dot" style="background:#2563eb"></span>Press Hit</div>
+      <div class="item"><span class="dot" style="background:#7c3aed"></span>Op-Ed</div>
+      <div class="item"><span class="dot" style="background:#0891b2"></span>Editorial</div>
+      <div class="item"><span class="dot" style="background:#d97706"></span>Letter</div>
+    </div>
+  </div>
+
+  <div id="wall" class="wall"></div>
+
+<script>
+  const DATA = [{"date": "Mar 25, 2026", "dateIso": "2026-03-25", "outlet": "CBS News", "label": "Press Hit", "headline": "Proposed Front Range Passenger Rail widens travel options in Colorado from Fort Collins to Pueblo", "summary": "Proposed rail would widen travel options from Fort Collins to Pueblo as the \"Name the Train\" campaign launches.", "link": "https://www.cbsnews.com/colorado/news/proposed-front-range-passenger-rail-travel-colorado-fort-collins-pueblo/", "paywalled": false, "market": "New York City, New York", "reach": 46811414, "reachHuman": "46.8M", "tierReach": "featured", "momentum": 11, "tierMomentum": "featured"}, {"date": "Mar 10, 2026", "dateIso": "2026-03-10", "outlet": "CBS News", "label": "Press Hit", "headline": "Help decide the name of Colorado's Front Range Passenger Rail", "summary": "CBS News invites Coloradans to help choose a name for the future Front Range passenger rail service.", "link": "https://www.cbsnews.com/colorado/news/name-colorados-front-range-passenger-rail/", "paywalled": false, "market": "New York City, New York", "reach": 46811414, "reachHuman": "46.8M", "tierReach": "featured", "momentum": 10, "tierMomentum": "featured"}, {"date": "Mar 9, 2026", "dateIso": "2026-03-09", "outlet": "CBS News", "label": "Press Hit", "headline": "Get the chance to name the Front Range Passenger Rail coming to Colorado", "summary": "Coloradans get the chance to help name the Front Range Passenger Rail coming to the state.", "link": "https://www.cbsnews.com/colorado/video/get-the-chance-to-name-the-front-range-passenger-rail-coming-to-colorado/", "paywalled": false, "market": "New York City, New York", "reach": 46811414, "reachHuman": "46.8M", "tierReach": "featured", "momentum": 29, "tierMomentum": "featured"}, {"date": "Apr 16, 2026", "dateIso": "2026-04-16", "outlet": "CBS News", "label": "Press Hit", "headline": "Colorado's Front Range Passenger Rail plans to make stops across Boulder County", "summary": "CoCo will join the Union Station schedule in 2029, with stops planned across Boulder County as part of the Front Range Passenger Rail project.", "link": "https://www.cbsnews.com/colorado/video/colorados-front-range-passenger-rail-plans-to-make-stops-across-boulder-county/", "paywalled": false, "market": "New York City, New York", "reach": 44880895, "reachHuman": "44.9M", "tierReach": "featured", "momentum": 22, "tierMomentum": "featured"}, {"date": "Apr 16, 2026", "dateIso": "2026-04-16", "outlet": "CBS News", "label": "Press Hit", "headline": "Bus riders share thoughts on plans for 2029 opening of passenger rail train in a few years", "summary": "A packed Boulder town hall hears from bus riders eager to learn how CoCo could change their commutes when service begins in 2029.", "link": "https://www.cbsnews.com/colorado/video/bus-riders-share-thoughts-on-plans-for-2029-opening-of-passenger-rail-train-in-a-few-years/", "paywalled": false, "market": "New York City, New York", "reach": 44880895, "reachHuman": "44.9M", "tierReach": "featured", "momentum": 22, "tierMomentum": "featured"}, {"date": "Apr 11, 2026", "dateIso": "2026-04-11", "outlet": "CBS News", "label": "Press Hit", "headline": "Town hall shares update on plans for Colorado Connector", "summary": "CBS News covers a CoCo town hall where the District updated the public on service plans and the 2029 launch timeline.", "link": "https://www.cbsnews.com/colorado/video/town-hall-shares-update-on-plans-for-colorado-connector/", "paywalled": false, "market": "New York City, New York", "reach": 44880895, "reachHuman": "44.9M", "tierReach": "featured", "momentum": 5, "tierMomentum": "large"}, {"date": "Apr 9, 2026", "dateIso": "2026-04-09", "outlet": "CBS News", "label": "Press Hit", "headline": "Colorado's Front Range Passenger Rail reaches milestone agreement", "summary": "CBS News reports Colorado's Front Range Passenger Rail is \"full steam ahead\" after officials reached a preliminary agreement with BNSF that clears the path for CoCo.", "link": "https://www.cbsnews.com/colorado/news/colorados-front-range-passenger-rail-milestone-agreement/", "paywalled": false, "market": "New York City, New York", "reach": 44880895, "reachHuman": "44.9M", "tierReach": "large", "momentum": 33, "tierMomentum": "featured"}, {"date": "Apr 9, 2026", "dateIso": "2026-04-09", "outlet": "CBS News", "label": "Press Hit", "headline": "Front Range Passenger Rail announces proposed agreement with BNSF Railroad", "summary": "The District announces a proposed track-sharing agreement with BNSF Railroad.", "link": "https://www.cbsnews.com/colorado/video/front-range-passenger-rail-announces-proposed-agreement-with-bnsf-railroad/", "paywalled": false, "market": "New York City, New York", "reach": 44880895, "reachHuman": "44.9M", "tierReach": "large", "momentum": 33, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "CBS News", "label": "Press Hit", "headline": "Coloradans have spoken and chosen the name of the Front Range Passenger Rail", "summary": "Coloradans pick the name for the Front Range Passenger Rail, with service expected to begin in 2029.", "link": "https://www.cbsnews.com/colorado/news/colorado-front-range-passenger-rail-name-vote-results/", "paywalled": false, "market": "New York City, New York", "reach": 44880895, "reachHuman": "44.9M", "tierReach": "large", "momentum": 68, "tierMomentum": "featured"}, {"date": "Jun 3, 2026", "dateIso": "2026-06-03", "outlet": "CBS News", "label": "Press Hit", "headline": "Denver City Council to outline plans on Front Range Passenger Rail stops", "summary": "Denver City Council outlines plans for CoCo rail stops that could boost economic growth and spur development along the urban corridor.", "link": "https://www.cbsnews.com/colorado/video/denver-city-council-to-outline-plans-on-front-range-passenger-rail-stops/", "paywalled": false, "market": "New York City, New York", "reach": 44828866, "reachHuman": "44.8M", "tierReach": "large", "momentum": 14, "tierMomentum": "featured"}, {"date": "Jun 3, 2026", "dateIso": "2026-06-03", "outlet": "CBS News", "label": "Press Hit", "headline": "New Denver Broncos stadium could get passenger rail stop if voters approve funding", "summary": "The new Denver Broncos stadium could become a CoCo special-event stop if voters approve rail funding.", "link": "https://www.cbsnews.com/colorado/news/new-denver-broncos-stadium-could-get-passenger-rail-stop-if-voters-approve-funding/", "paywalled": false, "market": "New York City, New York", "reach": 44828866, "reachHuman": "44.8M", "tierReach": "large", "momentum": 14, "tierMomentum": "featured"}, {"date": "May 26, 2026", "dateIso": "2026-05-26", "outlet": "CBS News", "label": "Press Hit", "headline": "Fort Collins leaders discuss what a future CoCo train station will look like", "summary": "CBS News reports on Fort Collins leaders' early discussions about the design and location of the city's future CoCo station.", "link": "https://www.cbsnews.com/colorado/video/fort-collins-leaders-discuss-what-a-future-coco-train-station-will-look-like/", "paywalled": false, "market": "New York City, New York", "reach": 44828866, "reachHuman": "44.8M", "tierReach": "large", "momentum": 23, "tierMomentum": "featured"}, {"date": "Apr 2, 2026", "dateIso": "2026-04-02", "outlet": "Longmont Times-Call (via Yahoo! News)", "label": "Press Hit", "headline": "Longmont Front Range Passenger Rail town hall set Wednesday", "summary": "The District sets a Longmont town hall and asks the public to help name the service.", "link": "https://www.yahoo.com/news/articles/longmont-front-range-passenger-rail-204800478.html", "paywalled": false, "market": "Longmont, Colorado", "reach": 41919979, "reachHuman": "41.9M", "tierReach": "large", "momentum": 6, "tierMomentum": "large"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "Axios", "label": "Press Hit", "headline": "CoCo wins naming contest for new Front Range train service", "summary": "Axios reports the Front Range passenger train is officially CoCo \u2014 short for Colorado Connector \u2014 calling the quirky moniker a milestone in the project's public momentum.", "link": "https://www.axios.com/local/denver/2026/04/06/colorado-connector-front-range-rail-name", "paywalled": false, "market": "Arlington, Virginia", "reach": 17572737, "reachHuman": "17.6M", "tierReach": "large", "momentum": 68, "tierMomentum": "featured"}, {"date": "Mar 24, 2026", "dateIso": "2026-03-24", "outlet": "Travel And Tour World", "label": "Press Hit", "headline": "Littleton's Strategic Decision for Front Range Passenger Rail: A Major Economic Boost with Affordable Costs and Massive Potential Growth", "summary": "Littleton picks Mineral Station as its future CoCo stop, citing strong economic-growth potential.", "link": "https://www.travelandtourworld.com/news/article/littletons-strategic-decision-for-front-range-passenger-rail-a-major-economic-boost-with-affordable-costs-and-massive-potential-growth/", "paywalled": false, "market": "Littleton, Colorado", "reach": 8900543, "reachHuman": "8.9M", "tierReach": "large", "momentum": 11, "tierMomentum": "featured"}, {"date": "Mar 24, 2026", "dateIso": "2026-03-24", "outlet": "The Denver Post", "label": "Press Hit", "headline": "Littleton decides on location of Front Range Passenger Rail stop as economic potential takes shape", "summary": "The Denver Post reports Littleton chose the Mineral light rail station over its popular downtown for its CoCo stop, citing the site's stronger development potential.", "link": "https://www.denverpost.com/2026/03/24/littleton-front-range-passenger-rail-train-station/", "paywalled": true, "market": "Denver, Colorado", "reach": 1920252, "reachHuman": "1.9M", "tierReach": "large", "momentum": 11, "tierMomentum": "featured"}, {"date": "Mar 9, 2026", "dateIso": "2026-03-09", "outlet": "9NEWS KUSA-TV", "label": "Press Hit", "headline": "Colorado announces 4 potential names for new passenger train service", "summary": "The District announces four name finalists for the Front Range passenger train and opens public voting to let Coloradans make the final call.", "link": "https://www.9news.com/article/travel/front-range-passenger-rail-train-new-names/73-306b9cee-4bf7-4dbe-bb55-b8051ec1c35a", "paywalled": false, "market": "Denver, Colorado", "reach": 1918589, "reachHuman": "1.9M", "tierReach": "medium", "momentum": 29, "tierMomentum": "featured"}, {"date": "Apr 24, 2026", "dateIso": "2026-04-24", "outlet": "The Denver Post", "label": "Op-Ed", "headline": "Front Range rail is nostalgic but will 19th century technology answer 21st century challenges? (Opinion)", "summary": "Opinion: Allen Best weighs nostalgia vs. practicality but concludes Front Range passenger rail is needed and offers real benefits.", "link": "https://www.denverpost.com/2026/04/24/front-range-rail-colorado-connector-train-service/", "paywalled": true, "market": "Denver, Colorado", "reach": 1814512, "reachHuman": "1.8M", "tierReach": "medium", "momentum": 4, "tierMomentum": "medium"}, {"date": "May 27, 2026", "dateIso": "2026-05-27", "outlet": "9NEWS KUSA-TV", "label": "Press Hit", "headline": "Here's where the Denver-to-Fort Collins passenger train will stop and why", "summary": "9NEWS maps out the planned stops along the Denver-to-Fort Collins CoCo corridor and explains the reasoning behind each location.", "link": "https://www.9news.com/article/travel/where-the-denver-to-fort-collins-passenger-train-will-stop/73-3b5d289f-5fa5-406f-8d15-f64ace390d39", "paywalled": false, "market": "Denver, Colorado", "reach": 1758337, "reachHuman": "1.8M", "tierReach": "medium", "momentum": 14, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "9NEWS KUSA-TV", "label": "Press Hit", "headline": "Colorado's Front Range Passenger Rail gets a name", "summary": "9NEWS announces the Front Range passenger rail has been named CoCo \u2014 short for the Colorado Connector.", "link": "https://www.9news.com/video/news/local/next/next-with-kyle-clark/colorados-front-range-passenger-rail-gets-a-name/73-095833eb-ee6a-42ec-a620-cd13e0303d10", "paywalled": false, "market": "Denver, Colorado", "reach": 1678789, "reachHuman": "1.7M", "tierReach": "medium", "momentum": 68, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "9NEWS KUSA-TV", "label": "Press Hit", "headline": "Colorado's Front Range Passenger Rail gets a name, now it needs the money", "summary": "9NEWS reports the line now has a name \u2014 CoCo \u2014 but cautions that securing voter-approved funding is the next major hurdle.", "link": "https://www.9news.com/article/news/local/colorado-front-range-passenger-rail-name/73-d87442db-b27b-4f98-aa9e-375d1056861a", "paywalled": false, "market": "Denver, Colorado", "reach": 1678789, "reachHuman": "1.7M", "tierReach": "medium", "momentum": 68, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "KDVR-TV", "label": "Press Hit", "headline": "Coloradans name new passenger rail train; meet Coco", "summary": "Gov. Polis joins the District to announce CoCo as the official name of Colorado's future Front Range passenger train.", "link": "https://kdvr.com/news/local/coloradans-name-new-passenger-rail-train-meet-coco/", "paywalled": false, "market": "Denver, Colorado", "reach": 1109608, "reachHuman": "1.1M", "tierReach": "medium", "momentum": 68, "tierMomentum": "featured"}, {"date": "Mar 11, 2026", "dateIso": "2026-03-11", "outlet": "KMGH-TV (Denver7)", "label": "Press Hit", "headline": "Coloradans invited to help name new passenger train service", "summary": "Denver7 announces four finalists for the Front Range passenger train name, with GM Sal Pace saying the winner should reflect how Coloradans live and travel today.", "link": "https://www.denver7.com/news/state-news/coloradans-invited-to-help-name-new-passenger-train-service", "paywalled": false, "market": "Denver, Colorado", "reach": 941166, "reachHuman": "941K", "tierReach": "medium", "momentum": 6, "tierMomentum": "large"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "KMGH-TV (Denver7)", "label": "Press Hit", "headline": "Front Range Passenger Rail gets a name, but questions remain about funding", "summary": "Denver7 reports CoCo has a name, but notes that voter-approved funding remains the key outstanding question.", "link": "https://www.denver7.com/news/local-news/front-range-passenger-rail-gets-a-name-but-questions-remain-about-funding", "paywalled": false, "market": "Denver, Colorado", "reach": 795296, "reachHuman": "795K", "tierReach": "medium", "momentum": 68, "tierMomentum": "featured"}, {"date": "Feb 26, 2026", "dateIso": "2026-02-26", "outlet": "KKTV-TV", "label": "Press Hit", "headline": "Front Range Passenger Rail District hosts open house for community feedback on potential railway", "summary": "KKTV reports the District is hosting open houses along the I-25 corridor, giving Coloradans a say in the shape of the passenger rail project.", "link": "https://www.kktv.com/2026/02/27/front-range-passenger-rail-district-hosts-open-house-community-feedback-potential-railway/", "paywalled": false, "market": "Colorado Springs", "reach": 663940, "reachHuman": "664K", "tierReach": "medium", "momentum": 3, "tierMomentum": "medium"}, {"date": "Apr 7, 2026", "dateIso": "2026-04-07", "outlet": "KKTV-TV", "label": "Press Hit", "headline": "Front Range Passenger Rail District continues town hall meetings across the Front Range", "summary": "KKTV reports the District is continuing its community tour with town halls across the Front Range to share CoCo plans.", "link": "https://www.kktv.com/2026/04/07/front-range-passenger-rail-district-continues-town-hall-meetings-across-front-range/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 565967, "reachHuman": "566K", "tierReach": "medium", "momentum": 23, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "KKTV-TV", "label": "Press Hit", "headline": "Coloradans choose name for future Front Range passenger rail train", "summary": "Gov. Polis announces the winning name: Coloradans have chosen \"CoCo\" \u2014 short for Colorado Connector \u2014 for Colorado's future Front Range passenger rail train.", "link": "https://www.kktv.com/2026/04/06/coloradans-choose-name-future-front-range-passenger-rail-train/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 565967, "reachHuman": "566K", "tierReach": "medium", "momentum": 68, "tierMomentum": "featured"}, {"date": "Apr 29, 2026", "dateIso": "2026-04-29", "outlet": "Coloradoan", "label": "Press Hit", "headline": "Front Range Passenger Rail from Fort Collins to Denver has green light", "summary": "Four governing boards give CoCo the green light, with the Fort Collins-Denver trip projected at no more than 108 minutes and service set to begin in 2029.", "link": "https://eu.coloradoan.com/story/news/local/colorado/2026/04/29/colorado-front-range-passenger-rail-gets-green-light-starting-in-2029/89855809007/", "paywalled": true, "market": "Fort Collins, Colorado", "reach": 561974, "reachHuman": "562K", "tierReach": "medium", "momentum": 10, "tierMomentum": "featured"}, {"date": "Jun 18, 2026", "dateIso": "2026-06-18", "outlet": "Coloradoan", "label": "Press Hit", "headline": "Where is the proposed passenger rail station for Fort Collins?", "summary": "The Coloradoan maps the proposed CoCo station site just north of Drake Road in Fort Collins.", "link": "https://eu.coloradoan.com/videos/news/2026/06/18/where-is-the-proposed-passenger-rail-station-for-fort-collins/90614202007/", "paywalled": true, "market": "Fort Collins, Colorado", "reach": 556077, "reachHuman": "556K", "tierReach": "medium", "momentum": 3, "tierMomentum": "medium"}, {"date": "Mar 9, 2026", "dateIso": "2026-03-09", "outlet": "KKTV-TV", "label": "Press Hit", "headline": "Public asked to vote on name for Front Range Passenger Rail District train", "summary": "KKTV reports the District is asking Coloradans to help name the Front Range passenger train it says will launch in 2029.", "link": "https://www.kktv.com/2026/03/09/public-asked-vote-name-front-range-passenger-rail-district-train/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 542774, "reachHuman": "543K", "tierReach": "medium", "momentum": 29, "tierMomentum": "featured"}, {"date": "Jun 15, 2026", "dateIso": "2026-06-15", "outlet": "The Gazette", "label": "Op-Ed", "headline": "Guest Opinion: CoCo would provide diversified transportation options", "summary": "Op-ed: former GOP lawmaker Mark Waller makes the conservative case that Colorado needs the CoCo train, and soon.", "link": "https://gazette.com/2026/06/15/guest-opinion-coco-would-provide-diversified-transportation-options/", "paywalled": true, "market": "Colorado Springs, Colorado", "reach": 471918, "reachHuman": "472K", "tierReach": "medium", "momentum": 3, "tierMomentum": "medium"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "KRDO-TV", "label": "Press Hit", "headline": "Colorado's Future Front Range Passenger Rail Train officially named 'CoCo'", "summary": "KRDO reports that more than 25,000 Coloradans voted and chose \"CoCo\" as the official name of the future Front Range passenger rail train.", "link": "https://krdo.com/news/top-stories/2026/04/06/colorados-future-front-range-passenger-rail-train-officially-named-coco/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 469624, "reachHuman": "470K", "tierReach": "medium", "momentum": 68, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "KOAA-TV", "label": "Press Hit", "headline": "Coloradans choose 'CoCo' as name for new passenger train service", "summary": "Coloradans chose \"CoCo\" \u2014 short for Colorado Connector \u2014 over three other finalists: Colorado Ranger, FRED, and RangeLink.", "link": "https://www.koaa.com/news/local-news/coloradans-choose-coco-as-name-for-new-passenger-train-service", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 452079, "reachHuman": "452K", "tierReach": "small", "momentum": 68, "tierMomentum": "featured"}, {"date": "Mar 27, 2026", "dateIso": "2026-03-27", "outlet": "KOAA-TV", "label": "Press Hit", "headline": "Colorado Springs residents weigh in on proposed Front Range passenger train connecting Fort Collins to Pueblo", "summary": "Colorado Springs residents gather at Mt. Carmel Veterans Service Center to weigh in on the proposed CoCo line connecting Fort Collins to Pueblo.", "link": "https://www.koaa.com/news/local-news/colorado-springs-residents-weigh-in-on-proposed-front-range-passenger-train-connecting-fort-collins-to-pueblo", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 383145, "reachHuman": "383K", "tierReach": "small", "momentum": 7, "tierMomentum": "large"}, {"date": "Jun 26, 2026", "dateIso": "2026-06-26", "outlet": "Daily Camera", "label": "Press Hit", "headline": "Colorado Connector has Louisville City Council's support. But how does the public feel about envisioned passenger rail?", "summary": "As the Louisville City Council indicated its support for advancing the Colorado Connector project, the Boulder Daily Camera guaged public sentiment regarding the proposed passenger train.", "link": "https://www.dailycamera.com/2026/06/26/colorado-louisville-front-range-passenger-rail/", "paywalled": true, "market": "Boulder, Colorado", "reach": 259591, "reachHuman": "260K", "tierReach": "small", "momentum": 1, "tierMomentum": "small"}, {"date": "May 20, 2026", "dateIso": "2026-05-20", "outlet": "Daily Camera", "label": "Op-Ed", "headline": "RTD is back on track. Hop on board. (Opinion)", "summary": "Opinion: RTD is turning a corner, launching the engineering that lets CoCo extend rail to Fort Collins.", "link": "https://www.dailycamera.com/2026/05/20/rtd-bus-train-front-range-passenger-rail-airport-opinion/", "paywalled": true, "market": "Boulder, Colorado", "reach": 251941, "reachHuman": "252K", "tierReach": "small", "momentum": 3, "tierMomentum": "medium"}, {"date": "May 13, 2026", "dateIso": "2026-05-13", "outlet": "Daily Camera", "label": "Press Hit", "headline": "Longmont sticks to voluntary watering restrictions; council stays on board passenger rail", "summary": "Longmont City Council reaffirms its support for the passenger-rail line during a council update.", "link": "https://www.dailycamera.com/2026/05/13/longmont-council-drought-passenger-rail/", "paywalled": true, "market": "Boulder, Colorado", "reach": 251941, "reachHuman": "252K", "tierReach": "small", "momentum": 5, "tierMomentum": "large"}, {"date": "Feb 20, 2026", "dateIso": "2026-02-20", "outlet": "FOX 21 News - KXRM-TV", "label": "Press Hit", "headline": "Mt. Carmel hosting passenger rail community meeting", "summary": "FOX 21 reports Mt. Carmel Veterans Service Center in Colorado Springs will host a CoCo community input meeting.", "link": "https://www.fox21news.com/news/local/mt-carmel-hosting-passenger-rail-community-meeting/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 237575, "reachHuman": "238K", "tierReach": "small", "momentum": 2, "tierMomentum": "medium"}, {"date": "Apr 19, 2026", "dateIso": "2026-04-19", "outlet": "Daily Camera", "label": "Editorial", "headline": "A Denver-Boulder train is 20 years overdue. Let's make CoCo real by 2029. (Editorial)", "summary": "Editorial: a Denver-Boulder train is two decades overdue, and Boulder should help make CoCo real by 2029.", "link": "https://www.dailycamera.com/2026/04/19/denver-boulder-rtd-train-fastracks-coco-front-range-rail-editorial/", "paywalled": true, "market": "Boulder, Colorado", "reach": 231212, "reachHuman": "231K", "tierReach": "small", "momentum": 1, "tierMomentum": "small"}, {"date": "Feb 24, 2026", "dateIso": "2026-02-24", "outlet": "Daily Camera", "label": "Letter to the Editor", "headline": "The Dark Horse made Boulder special; Steele's columns; TrumpRX; FasTracks (Letters)", "summary": "Letter: a writer spotlights the new RTD, CDOT and District joint-service agreement moving the train forward.", "link": "https://www.dailycamera.com/2026/02/24/letters-dark-horse-closing-boulder-housing/", "paywalled": true, "market": "Boulder", "reach": 227356, "reachHuman": "227K", "tierReach": "small", "momentum": 6, "tierMomentum": "large"}, {"date": "Mar 6, 2026", "dateIso": "2026-03-06", "outlet": "Daily Camera", "label": "Press Hit", "headline": "Longmont City Council to vote on new FRCC campus, transit hub agreements", "summary": "The Daily Camera reports Longmont City Council voted on transit-hub agreements tied to future Front Range passenger rail.", "link": "https://www.dailycamera.com/2026/03/06/longmont-council-new-frcc-campus-transit-hub/", "paywalled": true, "market": "Boulder, Colorado", "reach": 206378, "reachHuman": "206K", "tierReach": "small", "momentum": 6, "tierMomentum": "large"}, {"date": "Mar 26, 2026", "dateIso": "2026-03-26", "outlet": "FOX 21 News - KXRM-TV", "label": "Press Hit", "headline": "Second meeting held for Front Range passenger rail", "summary": "FOX 21 covers the District's second second town hall at Mt. Carmel Veterans Service Center as public engagement on CoCo expands statewide.", "link": "https://www.fox21news.com/news/second-meeting-held-for-front-range-passenger-rail/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 150017, "reachHuman": "150K", "tierReach": "small", "momentum": 6, "tierMomentum": "large"}, {"date": "Mar 9, 2026", "dateIso": "2026-03-09", "outlet": "FOX 21 News - KXRM-TV", "label": "Press Hit", "headline": "Front Range Passenger Rail holds community meeting in Pueblo", "summary": "FOX 21 covers the District's Pueblo community meeting, where officials highlight the economic impact CoCo will bring to communities along the entire corridor.", "link": "https://www.fox21news.com/news/front-range-passenger-rail-holds-community-meeting-in-pueblo/", "paywalled": false, "market": "Colorado Springs, Colorado", "reach": 150017, "reachHuman": "150K", "tierReach": "small", "momentum": 29, "tierMomentum": "featured"}, {"date": "Apr 9, 2026", "dateIso": "2026-04-09", "outlet": "KUNC-FM", "label": "Press Hit", "headline": "Transit boards will vote on whether to move forward with new passenger rail proposal for Northern Colorado", "summary": "KUNC reports CDOT and RTD boards are set to vote on CoCo, with GM Sal Pace saying track access had been the one significant hurdle standing in the way.", "link": "https://www.kunc.org/news/2026-04-09/transit-boards-will-vote-on-whether-to-move-forward-with-new-passenger-rail-proposal-for-northern-colorado", "paywalled": false, "market": "Greeley, Colorado", "reach": 123420, "reachHuman": "123K", "tierReach": "small", "momentum": 33, "tierMomentum": "featured"}, {"date": "Apr 6, 2026", "dateIso": "2026-04-06", "outlet": "KUNC-FM", "label": "Press Hit", "headline": "Colorado's future Front Range passenger train has a name, and yes, it's a little silly", "summary": "KUNC announces Coloradans have chosen \"CoCo\" \u2014 a name that's a little silly but perfectly Colorado \u2014 for the future passenger train.", "link": "https://www.kunc.org/news/2026-04-06/colorados-future-front-range-passenger-train-has-a-name-and-yes-its-a-little-silly", "paywalled": false, "market": "Greeley, Colorado", "reach": 123420, "reachHuman": "123K", "tierReach": "small", "momentum": 68, "tierMomentum": "featured"}, {"date": "Apr 18, 2026", "dateIso": "2026-04-18", "outlet": "Loveland Reporter-Herald", "label": "Press Hit", "headline": "Loveland crowd shows support at Front Range passenger rail town hall", "summary": "A packed Loveland town hall shows strong public support for CoCo, with residents enthusiastic about a stop in their city.", "link": "https://www.reporterherald.com/2026/04/18/loveland-crowd-shows-support-at-front-range-passenger-rail-town-hall/", "paywalled": true, "market": "Loveland, Colorado", "reach": 116991, "reachHuman": "117K", "tierReach": "small", "momentum": 6, "tierMomentum": "large"}, {"date": "Jun 2, 2026", "dateIso": "2026-06-02", "outlet": "BizWest", "label": "Press Hit", "headline": "Loveland, Louisville to weigh passenger-rail commitments", "summary": "Loveland and Louisville city councils take up resolutions backing their cities' role in the Denver-Fort Collins line.", "link": "https://bizwest.com/2026/06/02/loveland-louisville-to-weigh-passenger-rail-commitments/", "paywalled": true, "market": "Fort Collins, Colorado", "reach": 49552, "reachHuman": "50K", "tierReach": "small", "momentum": 3, "tierMomentum": "medium"}, {"date": "May 19, 2026", "dateIso": "2026-05-19", "outlet": "BizWest", "label": "Editorial", "headline": "Editorial: Rail service between Fort Collins, Denver a welcome first step", "summary": "BizWest editorial welcomes CoCo \u2014 three daily Fort Collins-Denver round-trips launching in 2029 \u2014 as a practical first step toward statewide rail.", "link": "https://bizwest.com/2026/05/19/editorial-rail-service-between-fort-collins-denver-a-welcome-first-step/", "paywalled": true, "market": "Boulder, Colorado", "reach": 49552, "reachHuman": "50K", "tierReach": "small", "momentum": 3, "tierMomentum": "medium"}, {"date": "Apr 18, 2026", "dateIso": "2026-04-18", "outlet": "Montrose Daily Press", "label": "Op-Ed", "headline": "OPINION: Reinventing passenger rail along the Front Range", "summary": "Op-ed: the District's plan for three daily Fort Collins-Denver round-trips marks a reinvention of Front Range rail.", "link": "https://www.montrosepress.com/opinion/opinion-reinventing-passenger-rail-along-the-front-range/article_b5b5472c-8ad8-4d8e-823a-ede401e5708a.html", "paywalled": false, "market": "Montrose, Colorado", "reach": 28888, "reachHuman": "29K", "tierReach": "small", "momentum": 6, "tierMomentum": "large"}, {"date": "May 5, 2026", "dateIso": "2026-05-05", "outlet": "Westminster Window", "label": "Press Hit", "headline": "Westminster cheers new deal to bring rail to northern cities", "summary": "Westminster officials and residents cheer the new deal bringing rail service to northern Front Range cities.", "link": "https://www.westminsterwindow.com/news/article_26547558-a1d7-488b-a96e-f8be7990f069.html", "paywalled": false, "market": "Westminster, Colorado", "reach": 3387, "reachHuman": "3K", "tierReach": "small", "momentum": 1, "tierMomentum": "small"}, {"date": "May 4, 2026", "dateIso": "2026-05-04", "outlet": "Southern Colorado Business Forum & Digest", "label": "Press Hit", "headline": "Colorado Springs, Pueblo Back Colorado Connector Passenger Rail as Ballot Vote Nears", "summary": "Colorado Springs and Pueblo voice support for the Colorado Connector as a ballot vote nears.", "link": "https://socodigest.com/2026/05/04/front-range-passenger-rail-colorado-connector/", "paywalled": false, "market": "", "reach": 2682, "reachHuman": "3K", "tierReach": "small", "momentum": 5, "tierMomentum": "large"}, {"date": "Jun 30, 2026", "dateIso": "2026-06-30", "outlet": "9News", "label": "Press Hit", "headline": "Come On Ride that Train...the COCO Train!", "summary": "Front Range Passenger Rail General Manager Sal Pace discusses plans for CoCo, an express passenger train that is scheduled to begin service in January 2029.", "link": "https://www.9news.com/video/entertainment/television/programs/colorado-and-company/come-on-ride-that-trainthe-coco-train/73-11b22f68-492d-4583-bc1b-6f9200efb9c1", "paywalled": false, "market": "", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 1, "tierMomentum": "small"}, {"date": "Jun 22, 2026", "dateIso": "2026-06-22", "outlet": "KOAA-TV", "label": "Press Hit", "headline": "Pueblo City Council passes resolution in support of proposed station for 'CoCo'", "summary": "The Pueblo City Council passed a resolution by a 6-1 vote in support of a proposed CoCo station. Pueblo City Council District 2 Representative Joe Latino was the only councilmember who voted against the proposed station, saying that Pueblo should be a higher priority since the plan has northern Colorado getting passenger train service sooner.", "link": "https://www.koaa.com/news/local-news/pueblo-city-council-passes-resolution-in-support-of-proposed-station-for-coco", "paywalled": false, "market": "Pueblo, Colorado", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 1, "tierMomentum": "small"}, {"date": "Jun 19, 2026", "dateIso": "2026-06-19", "outlet": "Pueblo Chieftain", "label": "Press Hit", "headline": "Pueblo stop on Front Range Passenger Rail could be active by 2032", "summary": "The Pueblo Chieftain reports that Pueblo's CoCo station could be operational by 2032, as planning advances for the southern end of the route.", "link": "https://www.chieftain.com/story/news/2026/06/19/when-is-passenger-rail-service-coming-to-pueblo-colorado/90597078007/?gnt-cfr=1&gca-cat=p&gca-uir=true&gca-epti=z118821p115150c115150e005900v118821d--42--b--42--&gca-ft=86&gca-ds=sophi", "paywalled": true, "market": "", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 6, "tierMomentum": "large"}, {"date": "Jun 16, 2026", "dateIso": "2026-06-16", "outlet": "The Badger", "label": "Press Hit", "headline": "Littleton council backs proposed Front Range passenger rail stop at Mineral Station", "summary": "Littleton City Council backs a CoCo stop at Mineral Station, adding another city to the growing list of municipal supporters.", "link": "https://denver.thebadger.news/articles/2026-06-16-littleton-council-backs-mineral-station-front-range-rail-stop", "paywalled": false, "market": "", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 1, "tierMomentum": "small"}, {"date": "May 20, 2026", "dateIso": "2026-05-20", "outlet": "Longmont Times-Call", "label": "Letter to the Editor", "headline": "Letters: CoCo train welcomed; criticism for Gov. Polis", "summary": "Letter: a Longmont resident welcomes CoCo as a real, near-term train after a 20-year wait for promised FasTracks rail.", "link": "https://www.timescall.com/2026/05/20/letters-coco-train-welcomed-criticism-for-gov-polis/", "paywalled": true, "market": "Longmont, Colorado", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 3, "tierMomentum": "medium"}, {"date": "May 16, 2026", "dateIso": "2026-05-16", "outlet": "Longmont Times-Call", "label": "Op-Ed", "headline": "Karen Benker: RTD has turned a corner (guest opinion)", "summary": "Op-ed: former RTD director Karen Benker says RTD has turned a corner, with CoCo set to extend the line to Fort Collins.", "link": "https://www.timescall.com/2026/05/16/karen-benker-rtd-has-turned-a-corner-guest-opinion/", "paywalled": true, "market": "Longmont, Colorado", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 3, "tierMomentum": "medium"}, {"date": "May 10, 2026", "dateIso": "2026-05-10", "outlet": "Denver Post (print)", "label": "Op-Ed", "headline": "We're Not Dreaming About Passenger Rail \u2014 We're Building It (Elbra Wedgeworth)", "summary": "Op-ed: District chair Elbra Wedgeworth says Colorado isn't dreaming about passenger rail anymore \u2014 it's building it.", "link": "https://enewspaper.denverpost.com/html5/reader/production/default.aspx?pnum=33&edid=1a680724-aa01-423c-aac3-5ba0d1438e86&isshared=true", "paywalled": true, "market": "Denver, Colorado", "reach": 0, "reachHuman": null, "tierReach": "small", "momentum": 1, "tierMomentum": "small"}];
+
+  const ACCENTS = {
+    "Press Hit": "#2563eb",
+    "Op-Ed": "#7c3aed",
+    "Editorial": "#0891b2",
+    "Letter to the Editor": "#d97706",
+  };
+  const TIER_CLASS = {
+    featured: "t-featured",
+    large: "t-large",
+    medium: "t-medium",
+    small: "t-small",
+  };
+
+  let sortMode = "momentum";
+  let sizeMode = "momentum";
+  let filterMode = "all";
+
+  const wall = document.getElementById("wall");
+  const sizeHint = document.getElementById("sizeHint");
+  const HINTS = {
+    momentum: "card size reflects story momentum (total press hits in master tracker that cycle)",
+    reach: "card size reflects audience reach",
+  };
+
+  function esc(s) {
+    return (s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function cardHtml(r) {
+    const accent = ACCENTS[r.label] || "#2563eb";
+    const tierKey = sizeMode === "momentum" ? r.tierMomentum : r.tierReach;
+    const tier = TIER_CLASS[tierKey] || "t-small";
+    const lock = r.paywalled ? '<span class="lock" title="Paywalled">&#128274;</span>' : "";
+    const surge = r.momentum > 1 ? `<span class="surge" title="Total press hits in master tracker on this date">&#9650; ${r.momentum} hits that cycle</span>` : "";
+    const reach = r.reachHuman ? `<span class="reach">${r.reachHuman} reach</span>` : "";
+    const badge = sizeMode === "momentum" ? (surge || reach) : (reach || surge);
+    const summary = r.summary ? `<div class="summary">${esc(r.summary)}</div>` : "";
+    const surgeNote = r.momentum > 1 ? ` &middot; ${r.momentum} total hits in tracker` : "";
+    const date = r.date ? `<div class="date">${esc(r.date)}${r.market ? " &middot; " + esc(r.market) : ""}${surgeNote}</div>` : "";
+    const btn = (r.link && r.link.startsWith("http"))
+      ? `<a class="read" href="${esc(r.link)}" target="_blank" rel="noopener">Read article &rarr;</a>`
+      : `<span class="read disabled">No link</span>`;
+    return `
+      <article class="card ${tier}" style="--accent:${accent}" data-label="${esc(r.label)}">
+        <div class="outlet">${esc(r.outlet)} ${lock}</div>
+        <div class="headline">${esc(r.headline)}</div>
+        <div class="badge">${badge}</div>
+        <div class="reveal">
+          ${date}
+          ${summary}
+          ${btn}
+        </div>
+      </article>`;
+  }
+
+  function currentRecords() {
+    let recs = DATA.slice();
+    if (filterMode !== "all") recs = recs.filter(r => r.label === filterMode);
+    if (sortMode === "reach") recs.sort((a, b) => b.reach - a.reach);
+    else if (sortMode === "date") recs.sort((a, b) => (b.dateIso || "").localeCompare(a.dateIso || ""));
+    else if (sortMode === "outlet") recs.sort((a, b) => a.outlet.localeCompare(b.outlet));
+    else if (sortMode === "momentum") recs.sort((a, b) =>
+      (b.momentum - a.momentum) || (b.dateIso || "").localeCompare(a.dateIso || "") || (b.reach - a.reach));
+    return recs;
+  }
+
+  function render() {
+    const recs = currentRecords();
+    if (!recs.length) {
+      wall.innerHTML = '<div class="empty">No stories match this filter.</div>';
+      return;
+    }
+    wall.innerHTML = recs.map(cardHtml).join("");
+    document.getElementById("count").textContent = recs.length;
+  }
+
+  document.querySelectorAll("[data-sort]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-sort]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      sortMode = btn.dataset.sort;
+      render();
+    });
+  });
+  document.querySelectorAll("[data-size]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-size]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      sizeMode = btn.dataset.size;
+      sizeHint.textContent = HINTS[sizeMode];
+      render();
+    });
+  });
+  document.querySelectorAll("[data-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-filter]").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      filterMode = btn.dataset.filter;
+      render();
+    });
+  });
+
+  render();
+</script>
+</body>
+</html>
